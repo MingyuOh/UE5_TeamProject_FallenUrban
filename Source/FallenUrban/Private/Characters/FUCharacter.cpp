@@ -9,6 +9,7 @@
 #include "Components/InputComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Characters/FUCharacter.h"
 
 AFUCharacter::AFUCharacter()
 {
@@ -46,8 +47,8 @@ void AFUCharacter::BeginPlay()
 void AFUCharacter::Move(const FInputActionValue& Value)
 {
 	const FVector2D MovementVector = Value.Get<FVector2D>();
-	const FRotator Rotation = GetController()->GetControlRotation();
-	const FRotator YawRotation = FRotator(0.0f, Rotation.Yaw, 0.0f);
+	const FRotator Rotation = Controller->GetControlRotation();
+	const FRotator YawRotation(0.0f, Rotation.Yaw, 0.0f);
 
 	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 	AddMovementInput(ForwardDirection, MovementVector.Y);
@@ -68,6 +69,20 @@ void AFUCharacter::FKeyPressed()
 	UE_LOG(LogTemp, Warning, TEXT("[AFUCharacter] FKeyPressed()"));
 }
 
+void AFUCharacter::Attack()
+{
+	if (EnableAttack())
+	{
+		ActionState = EActionState::EAS_Attacking;
+	}
+}
+
+bool AFUCharacter::EnableAttack()
+{
+	return CharacterState != ECharacterState::ECS_Unequipped
+		&& ActionState == EActionState::EAS_Unoccupied;
+}
+
 void AFUCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -83,6 +98,7 @@ void AFUCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		EnhancedInputComponent->BindAction(MovementAction, ETriggerEvent::Triggered, this, &AFUCharacter::Move);
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AFUCharacter::Look);
 		EnhancedInputComponent->BindAction(FKeyAction, ETriggerEvent::Triggered, this, &AFUCharacter::FKeyPressed);
+		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AFUCharacter::Attack);
 	}
 
 }

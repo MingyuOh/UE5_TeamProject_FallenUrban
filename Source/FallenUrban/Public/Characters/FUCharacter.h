@@ -29,6 +29,9 @@ private:
 	UCameraComponent* ViewCamera;
 
 protected:
+	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
+	EActionState ActionState = EActionState::EAS_Unoccupied;
+
 	UPROPERTY(EditAnywhere, Category = Input)
 	UInputMappingContext* FUContext;
 
@@ -41,6 +44,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Input)
 	UInputAction* FKeyAction;
 
+	UPROPERTY(EditAnywhere, Category = Input)
+	UInputAction* AttackAction;
+
 /// <summary>
 /// Functions area
 /// </summary>
@@ -50,11 +56,18 @@ protected:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	virtual void FKeyPressed();
+	virtual void Attack();
+
+	bool EnableAttack();
 
 public:	
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	FORCEINLINE ECharacterState GetCharacterState() 
+	{ 
+		return CharacterState; 
+	}
 public:
 	AFUCharacter();
 
