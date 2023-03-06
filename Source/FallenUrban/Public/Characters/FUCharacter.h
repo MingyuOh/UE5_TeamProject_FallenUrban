@@ -54,13 +54,16 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Input)
 	UInputAction* AttackAction;
 
+	UPROPERTY(EditAnywhere, Category = Input)
+	UInputAction* JumpAction;
+
 /// <summary>
 /// Functions area
 /// </summary>
 protected:
 	virtual void BeginPlay() override;
 
-	void Move(const FInputActionValue& Value);
+	virtual void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void FKeyPressed();
 	void EKeyPressed();

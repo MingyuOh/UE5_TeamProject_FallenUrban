@@ -25,6 +25,7 @@ void UFUAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	if (FUCharacterMovement)
 	{
 		GroundSpeed = UKismetMathLibrary::VSizeXY(FUCharacterMovement->Velocity);
+		isFalling = FUCharacterMovement->IsFalling();
 		CharacterState = FUCharacter->GetCharacterState();
 	}
 }
