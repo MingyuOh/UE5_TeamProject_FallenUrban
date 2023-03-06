@@ -1,15 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Characters/FUCharacter.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Animation/AnimMontage.h"
 
 #include "Components/InputComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "Characters/FUCharacter.h"
 
 AFUCharacter::AFUCharacter()
 {
@@ -69,11 +66,52 @@ void AFUCharacter::FKeyPressed()
 	UE_LOG(LogTemp, Warning, TEXT("[AFUCharacter] FKeyPressed()"));
 }
 
+void AFUCharacter::EKeyPressed()
+{
+
+}
+
 void AFUCharacter::Attack()
 {
 	if (EnableAttack())
 	{
+		PlayAttackMontage();
 		ActionState = EActionState::EAS_Attacking;
+	}
+}
+
+void AFUCharacter::PlayAttackMontage()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AttackMontage && AnimInstance)
+	{
+		AnimInstance->Montage_Play(AttackMontage);
+		const uint32 Selection = FMath::RandRange(0, 4);
+		FName SelectionName = FName();
+		switch (Selection)
+		{
+		case 0:
+		{
+			SelectionName = FName("Attack1");
+		}break;
+		case 1:
+		{
+			SelectionName = FName("Attack2");
+		}break;
+		case 2:
+		{
+			SelectionName = FName("Attack3");
+		}break;
+		case 3:
+		{
+			SelectionName = FName("Attack4");
+		}break;
+		default:
+		{
+
+		}break;
+		}
+		AnimInstance->Montage_JumpToSection(SelectionName, AttackMontage);
 	}
 }
 
@@ -81,6 +119,11 @@ bool AFUCharacter::EnableAttack()
 {
 	return CharacterState != ECharacterState::ECS_Unequipped
 		&& ActionState == EActionState::EAS_Unoccupied;
+}
+
+void AFUCharacter::AttackEnd()
+{
+	ActionState = EActionState::EAS_Unoccupied;
 }
 
 void AFUCharacter::Tick(float DeltaTime)
@@ -98,6 +141,7 @@ void AFUCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		EnhancedInputComponent->BindAction(MovementAction, ETriggerEvent::Triggered, this, &AFUCharacter::Move);
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AFUCharacter::Look);
 		EnhancedInputComponent->BindAction(FKeyAction, ETriggerEvent::Triggered, this, &AFUCharacter::FKeyPressed);
+		EnhancedInputComponent->BindAction(EKeyAction, ETriggerEvent::Triggered, this, &AFUCharacter::EKeyPressed);
 		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AFUCharacter::Attack);
 	}
 

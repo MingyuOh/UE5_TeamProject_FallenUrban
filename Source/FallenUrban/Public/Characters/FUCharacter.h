@@ -12,6 +12,7 @@ class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
+class UAnimMontage;
 
 UCLASS()
 class FALLENURBAN_API AFUCharacter : public ACharacter
@@ -27,6 +28,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* ViewCamera;
+
+	UPROPERTY(EditDefaultsOnly, Category = Montages)
+	UAnimMontage* AttackMontage;
 
 protected:
 	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
@@ -45,6 +49,9 @@ protected:
 	UInputAction* FKeyAction;
 
 	UPROPERTY(EditAnywhere, Category = Input)
+	UInputAction* EKeyAction;
+
+	UPROPERTY(EditAnywhere, Category = Input)
 	UInputAction* AttackAction;
 
 /// <summary>
@@ -55,11 +62,14 @@ protected:
 
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
-	virtual void FKeyPressed();
+	void FKeyPressed();
+	void EKeyPressed();
 	virtual void Attack();
+	void PlayAttackMontage();
 
 	bool EnableAttack();
-
+	UFUNCTION(BlueprintCallable)
+	void AttackEnd();
 public:	
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
